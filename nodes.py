@@ -190,12 +190,12 @@ class SaveEXR:
             "required": {
                 "images": ("IMAGE",),
                 "filename_prefix": ("STRING", {"default": "ComfyUI"}),
-                "create_path_if_missing": ("BOOLEAN", {"default": False}),
                 "tonemap": (["linear", "sRGB", "Reinhard"], {"default": "sRGB"}),
                 "version": ("INT", {"default": 1, "min": -1, "max": 999}),
                 "start_frame": ("INT", {"default": 1001, "min": 0, "max": 99999999}),
                 "frame_pad": ("INT", {"default": 4, "min": 1, "max": 8}),
                 "save_workflow": (["ui", "api", "ui + api", "none"],),
+                "create_path_if_missing": ("BOOLEAN", {"default": False}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -210,7 +210,7 @@ class SaveEXR:
 
     CATEGORY = "HQ-Image-Save"
 
-    def save_images(self, images, filename_prefix, create_path_if_missing, tonemap, version, start_frame, frame_pad, save_workflow, prompt=None, extra_pnginfo=None):
+    def save_images(self, images, filename_prefix, tonemap, version, start_frame, frame_pad, save_workflow, create_path_if_missing, prompt=None, extra_pnginfo=None):
         useabs = os.path.isabs(filename_prefix)
         if not useabs:
             full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
