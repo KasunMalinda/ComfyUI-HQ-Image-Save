@@ -195,6 +195,7 @@ class SaveEXR:
                 "start_frame": ("INT", {"default": 1001, "min": 0, "max": 99999999}),
                 "frame_pad": ("INT", {"default": 4, "min": 1, "max": 8}),
                 "save_workflow": (["ui", "api", "ui + api", "none"],),
+                "create_path_if_missing": ("BOOLEAN", {"default": False}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -209,7 +210,7 @@ class SaveEXR:
 
     CATEGORY = "HQ-Image-Save"
 
-    def save_images(self, images, filename_prefix, tonemap, version, start_frame, frame_pad, save_workflow, prompt=None, extra_pnginfo=None):
+    def save_images(self, images, filename_prefix, tonemap, version, start_frame, frame_pad, save_workflow, create_path_if_missing, prompt=None, extra_pnginfo=None):
         useabs = os.path.isabs(filename_prefix)
         if not useabs:
             full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
@@ -238,8 +239,12 @@ class SaveEXR:
             if os.path.basename(filename_prefix) == "":
                 basename = os.path.basename(os.path.normpath(filename_prefix))
                 basepath = os.path.join(os.path.normpath(filename_prefix) + ver, basename)
-            if not os.path.exists(os.path.dirname(basepath)):
-                os.mkdir(os.path.dirname(basepath))
+            dirpath = os.path.dirname(basepath)
+            if not os.path.exists(dirpath):
+                if create_path_if_missing:
+                    os.makedirs(dirpath, exist_ok=True)
+                else:
+                    raise Exception("Directory does not exist: " + dirpath)
         
         batch_size = linear.shape[0]
         if PROGRESS_BAR_ENABLED and batch_size > 1:
